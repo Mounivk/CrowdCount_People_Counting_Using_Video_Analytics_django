@@ -9,7 +9,6 @@ venv/
 .env/
 
 # Django
-db.sqlite3
 media/
 staticfiles/
 *.log
@@ -19,6 +18,7 @@ staticfiles/
 *.onnx
 *.h5
 
+.runs/detect/
 # Migrations cache
 */migrations/__pycache__/
 
@@ -27,8 +27,6 @@ staticfiles/
 Thumbs.db
 .vscode/
 .idea/
-
-.runs/detect
 
 # Jupyter
 .ipynb_checkpoints/
