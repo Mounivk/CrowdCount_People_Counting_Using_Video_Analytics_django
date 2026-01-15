@@ -12,25 +12,23 @@ venv/
 db.sqlite3
 media/
 staticfiles/
-
-# Migrations cache
-*/migrations/__pycache__/
+*.log
 
 # ML / Large model files
 *.pt
 *.onnx
 *.h5
 
-# Logs
-*.log
+# Migrations cache
+*/migrations/__pycache__/
 
 # OS / Editor
 .DS_Store
 Thumbs.db
 .vscode/
+.idea/
+
+.runs/detect
 
 # Jupyter
 .ipynb_checkpoints/
-
-# PyCharm
-.idea/
