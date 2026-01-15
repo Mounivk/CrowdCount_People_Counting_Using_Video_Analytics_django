@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environment
+venv/
+.env/
+
+# Django
+db.sqlite3
+media/
+staticfiles/
+
+# Migrations cache
+*/migrations/__pycache__/
+
+# ML / Large model files
+*.pt
+*.onnx
+*.h5
+
+# Logs
+*.log
+
+# OS / Editor
+.DS_Store
+Thumbs.db
+.vscode/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# PyCharm
+.idea/

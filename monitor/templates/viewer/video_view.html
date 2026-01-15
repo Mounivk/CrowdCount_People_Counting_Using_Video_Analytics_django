@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div style="display:flex; flex-direction:column; align-items:center; justify-content:center;
+            height:100vh; font-family:'Segoe UI';">
+
+    <h2>Uploaded Video (Processed)</h2>
+
+    <!-- VIDEO STREAM -->
+    <img id="videoStream"
+         src="{% url 'video_feed' video.id %}"
+         width="900"
+         style="max-width:90%; max-height:70vh; border-radius:12px;
+                box-shadow:0 12px 25px rgba(0,0,0,0.15); cursor:pointer;">
+
+    <div style="margin-top:20px;">
+        <h3>
+            Total People:
+            <span id="count" style="display:inline-block; transition:0.3s;">0</span>
+        </h3>
+        <h4>
+            Accuracy:
+            <span id="accuracy">0</span>%
+        </h4>
+    </div>
+
+    <!-- BUTTONS (UNCHANGED) -->
+    <div style="margin-top:20px;">
+        <button onclick="location.href='{% url 'viewer_dashboard' %}'"
+                style="background:#0f172a; color:white; padding:10px 20px;
+                       border:none; border-radius:8px;">
+            ← Go Back
+        </button>
+
+        <button onclick="location.reload();"
+                style="background:#0f172a; color:white; padding:10px 20px;
+                       border:none; border-radius:8px;">
+             Refresh Upload Video
+        </button>
+    </div>
+</div>
+
+<!-- ================= ALERT OVERLAY ================= -->
+<div id="alert-panel" style="
+    display:none;
+    position:fixed;
+    top:20px;
+    left:50%;
+    transform:translateX(-50%);
+    padding:18px 30px;
+    border-radius:14px;
+    font-weight:700;
+    font-size:18px;
+    z-index:9999;
+    box-shadow:0 15px 30px rgba(0,0,0,0.3);
+    animation:pulse 1s infinite;
+"></div>
+
+<!-- ================= EXTRA ANIMATIONS ================= -->
+<style>
+@keyframes pulse {
+    0% { transform:translateX(-50%) scale(1); }
+    50% { transform:translateX(-50%) scale(1.05); }
+    100% { transform:translateX(-50%) scale(1); }
+}
+
+.count-pop {
+    animation: pop 0.4s ease;
+}
+
+@keyframes pop {
+    0% { transform:scale(1); }
+    50% { transform:scale(1.4); color:#dc2626; }
+    100% { transform:scale(1); }
+}
+</style>
+
+<!-- ================= SCRIPT ================= -->
+<script>
+function showAlert(count) {
+    const panel = document.getElementById("alert-panel");
+
+    if (count >= 50) {
+        panel.style.display = "block";
+        panel.style.background = "linear-gradient(135deg, #7f1d1d, #dc2626)";
+        panel.style.color = "white";
+        panel.innerText = `🚨 EXTREME CROWD (${count}) – STOP ENTRY IMMEDIATELY`;
+
+    } else if (count >= 45) {
+        panel.style.display = "block";
+        panel.style.background = "linear-gradient(135deg, #f97316, #ea580c)";
+        panel.style.color = "white";
+        panel.innerText = `⚠️ CROWD WARNING (${count}) – MONITOR CLOSELY`;
+
+    } else if (count >= 35) {
+        panel.style.display = "block";
+        panel.style.background = "linear-gradient(135deg, #facc15, #eab308)";
+        panel.style.color = "#1e293b";
+        panel.innerText = `🟡 MODERATE CROWD (${count})`;
+
+    } else {
+        panel.style.display = "none";
+    }
+}
+
+let lastCount = 0;
+
+setInterval(() => {
+    fetch("{% url 'live_count_video' %}")
+        .then(res => res.json())
+        .then(data => {
+
+            const countEl = document.getElementById("count");
+
+            if (data.count !== lastCount) {
+                countEl.classList.add("count-pop");
+                setTimeout(() => countEl.classList.remove("count-pop"), 400);
+            }
+
+            countEl.innerText = data.count;
+            document.getElementById("accuracy").innerText = data.accuracy;
+
+            showAlert(data.count);
+            lastCount = data.count;
+        });
+}, 1000);
+
+/* ================= CLICK TO PAUSE / RESUME STREAM ================= */
+let paused = false;
+const video = document.getElementById("videoStream");
+
+video.addEventListener("click", () => {
+    if (!paused) {
+        video.style.opacity = "0.6";
+        video.title = "Paused (Click to Resume)";
+        paused = true;
+    } else {
+        video.style.opacity = "1";
+        video.title = "Live Feed";
+        paused = false;
+    }
+});
+</script>
+
+{% endblock %}

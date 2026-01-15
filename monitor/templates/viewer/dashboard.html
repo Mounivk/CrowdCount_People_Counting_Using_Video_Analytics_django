@@ -1,0 +1,220 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+/* ========== THEME VARIABLES ========== */
+:root {
+    --bg-color: #f5f7fb;
+    --card-bg: #ffffff;
+    --text-color: #000000;
+    --navbar-bg: #0f172a;
+    --btn-bg: #0f172a;
+    --subtitle: gray;
+}
+
+.dark-mode {
+    --bg-color: radial-gradient(circle at top, #020617, #000000);
+    --card-bg: #020617;
+    --text-color: #f8fafc;
+    --navbar-bg: #020617;
+    --btn-bg: #020617;
+    --subtitle: #94a3b8;
+}
+
+/* ========== BASE STYLES ========== */
+* {
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family: "Segoe UI", Arial, sans-serif;
+}
+
+body {
+    background: var(--bg-color);
+    color: var(--text-color);
+    transition: all 0.4s ease;
+}
+
+/* ========== DASHBOARD ========== */
+.container {
+    text-align:center;
+    padding:50px;
+}
+
+.subtitle {
+    color: var(--subtitle);
+    margin-bottom:40px;
+}
+
+/* ========== CARDS ========== */
+.card-container {
+    display:flex;
+    justify-content:center;
+    gap:40px;
+    flex-wrap:wrap;
+}
+
+.card {
+    background: var(--card-bg);
+    width:300px;
+    padding:30px;
+    border-radius:16px;
+    border:1px solid rgba(255,255,255,0.08);
+    box-shadow:0 15px 35px rgba(0,0,0,0.3);
+    transition: all 0.5s ease;
+    animation: floatIn 1s ease forwards;
+}
+
+/* Hover effect */
+.card:hover {
+    transform: translateY(-15px) scale(1.04);
+    box-shadow:0 0 35px rgba(99,102,241,0.4);
+}
+
+/* ========== CARD HEADINGS ========== */
+
+
+.card h2 {
+    background: linear-gradient(135deg, #e5e7eb, #f8fafc);
+    color: #020617;
+    padding: 14px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    font-weight: 600;
+    transition: all 0.4s ease;
+}
+
+/* DARK MODE – BLACK HEADING */
+.dark-mode .card h2 {
+    background: linear-gradient(135deg, #000000, #020617);
+    color: #ffffff;
+    box-shadow: 0 0 18px rgba(255,255,255,0.15);
+}
+
+/* DARK MODE PARAGRAPH – BLACK TEXT */
+.dark-mode .card p {
+    color: #000000;           /* BLACK text */
+    
+}
+
+
+/* ========== COUNT ========== */
+.count {
+    font-size:48px;
+    font-weight:bold;
+    margin-bottom:10px;
+}
+
+.green { color:#22c55e; }
+.blue { color:#3b82f6; }
+
+.dark-mode .green {
+    color:#4ade80;
+    text-shadow:0 0 12px rgba(74,222,128,0.4);
+}
+
+.dark-mode .blue {
+    color:#60a5fa;
+    text-shadow:0 0 12px rgba(96,165,250,0.4);
+}
+
+/* ========== BUTTONS ========== */
+.card button {
+    padding:10px 22px;
+    background: var(--btn-bg);
+    color:white;
+    border:1px solid #334155;
+    border-radius:10px;
+    cursor:pointer;
+    transition: all 0.3s ease;
+}
+
+.card button:hover {
+    transform: scale(1.08);
+    box-shadow:0 0 20px rgba(148,163,184,0.35);
+}
+
+/* ========== FOOTER ========== */
+footer {
+    margin-top:60px;
+    font-size:14px;
+    color: var(--subtitle);
+}
+
+/* ========== ANIMATIONS ========== */
+@keyframes floatIn {
+    from {
+        opacity:0;
+        transform: translateY(40px);
+    }
+    to {
+        opacity:1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes glowPulse {
+    0% {
+        box-shadow:0 0 10px rgba(255,255,255,0.15);
+    }
+    50% {
+        box-shadow:0 0 25px rgba(255,255,255,0.35);
+    }
+    100% {
+        box-shadow:0 0 10px rgba(255,255,255,0.15);
+    }
+}
+</style>
+
+<!-- ================= DASHBOARD ================= -->
+<div class="container">
+    <h1>Crowd Monitoring Dashboard</h1>
+    <p class="subtitle">Real-time People Counting | Live Webcam & Uploaded Videos</p>
+
+    <div class="card-container">
+        <div class="card">
+            <h2>Live Count</h2>
+            <div id="liveCount" class="count green">{{ live_count }}</div>
+            <p>View real-time webcam feed</p>
+            <button onclick="location.href='{% url 'live_webcam' %}'">Open Webcam</button>
+        </div>
+
+        <div class="card">
+            <h2>Uploaded Video</h2>
+            <div class="count blue">{{ video_count }}</div>
+            <p>Analyze uploaded videos</p>
+            {% if video %}
+                <button onclick="location.href='{% url 'video_view' video.id %}'">Open Video</button>
+            {% else %}
+                <button disabled>No videos uploaded yet</button>
+            {% endif %}
+        </div>
+    </div>
+
+</div>
+
+<script>
+/* ================= LIVE COUNT ================= */
+setInterval(() => {
+    fetch("{% url 'live_count_webcam' %}")
+        .then(res => res.json())
+        .then(data => {
+            document.getElementById("liveCount").innerText = data.count;
+        });
+}, 1000);
+
+/* ================= DARK MODE ================= */
+function toggleTheme() {
+    document.body.classList.toggle("dark-mode");
+    localStorage.setItem(
+        "theme",
+        document.body.classList.contains("dark-mode") ? "dark" : "light"
+    );
+}
+
+if (localStorage.getItem("theme") === "dark") {
+    document.body.classList.add("dark-mode");
+}
+</script>
+
+{% endblock %}
